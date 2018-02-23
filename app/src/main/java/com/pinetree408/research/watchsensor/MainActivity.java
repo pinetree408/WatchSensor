@@ -6,7 +6,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
@@ -15,7 +14,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.net.URISyntaxException;
-
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -34,30 +32,8 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     Socket socket;
 
-    String ip = "143.248.197.102";
+    String ip = "143.248.197.87";
     int port = 5000;
-
-    public class MyAsyncTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            socket.emit("request", params[0]);
-            return "done";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-        }
-
-        @Override
-        protected void onCancelled() {
-        }
-
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -130,20 +106,11 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(final SensorEvent event) {
         if (modeFlag == 1) {
-            /*
-            new MyAsyncTask().execute(
-                    Integer.toString(event.sensor.getType()) + "," +
-                    event.timestamp + "," +
-                    Float.toString(event.values[0]) + "," +
-                    Float.toString(event.values[1]) + "," +
-                    Float.toString(event.values[2])
-            );
-            */
             socket.emit("request",
                     Integer.toString(event.sensor.getType()) + "," +
-                    event.timestamp + "," +
+                            (event.timestamp / 1000000) + "," +
                     Float.toString(event.values[0]) + "," +
                     Float.toString(event.values[1]) + "," +
                     Float.toString(event.values[2]));
@@ -151,6 +118,5 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-    }
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 }
