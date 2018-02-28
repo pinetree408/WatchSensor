@@ -67,7 +67,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             public void call(Object... args) {}
 
         });
-        socket.connect();
 
         mTextView = findViewById(R.id.textView);
         mButton = findViewById(R.id.button1);
@@ -76,6 +75,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 if (modeFlag == 0) {
                     mTextView.setText("Recording");
                     modeFlag = 1;
+                    socket.connect();
                 } else {
                     mTextView.setText("Ready");
                     modeFlag = 0;
