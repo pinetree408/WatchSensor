@@ -32,7 +32,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     Socket socket;
 
-    String ip = "143.248.197.87";
+    String ip = "143.248.197.16";
     int port = 5000;
 
     @Override
@@ -42,8 +42,11 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         setAmbientEnabled();
 
+        IO.Options opts = new IO.Options();
+        opts.reconnection = false;
+
         try {
-            socket = IO.socket("http://" + ip + ":" + port + "/mynamespace");
+            socket = IO.socket("http://" + ip + ":" + port + "/mynamespace");//, opts);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -52,6 +55,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
             @Override
             public void call(Object... args) {
+                modeFlag = 1;
                 Log.d("Socket", "connect");
             }
 
@@ -59,12 +63,16 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
             @Override
             public void call(Object... args) {
+                Log.d("response", Long.toString(System.currentTimeMillis() % 1000));
             }
 
         }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
 
             @Override
-            public void call(Object... args) {}
+            public void call(Object... args) {
+                //socket.connect();
+                Log.d("Socket", "disconnect");
+            }
 
         });
 
@@ -73,9 +81,8 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         mButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 if (modeFlag == 0) {
-                    mTextView.setText("Recording");
-                    modeFlag = 1;
                     socket.connect();
+                    mTextView.setText("Recording");
                 } else {
                     mTextView.setText("Ready");
                     modeFlag = 0;
@@ -108,11 +115,12 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     @Override
     public void onSensorChanged(final SensorEvent event) {
         if (modeFlag == 1) {
+            Log.d("emit", Long.toString(System.currentTimeMillis() % 1000));
             socket.emit("request",
-                    Integer.toString(event.sensor.getType()) + "," +
-                            (event.timestamp / 1000000) + "," +
-                    Float.toString(event.values[0]) + "," +
-                    Float.toString(event.values[1]) + "," +
+                    Integer.toString(event.sensor.getType()),
+                            (event.timestamp / 1000000),
+                    Float.toString(event.values[0]),
+                    Float.toString(event.values[1]),
                     Float.toString(event.values[2]));
         }
     }
