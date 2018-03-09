@@ -32,7 +32,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     Socket socket;
 
-    String ip = "143.248.197.16";
+    String ip = "143.248.197.106";
     int port = 5000;
 
     @Override
@@ -63,14 +63,12 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
             @Override
             public void call(Object... args) {
-                Log.d("response", Long.toString(System.currentTimeMillis() % 1000));
             }
 
         }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
 
             @Override
             public void call(Object... args) {
-                //socket.connect();
                 Log.d("Socket", "disconnect");
             }
 
@@ -115,10 +113,9 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     @Override
     public void onSensorChanged(final SensorEvent event) {
         if (modeFlag == 1) {
-            Log.d("emit", Long.toString(System.currentTimeMillis() % 1000));
             socket.emit("request",
                     Integer.toString(event.sensor.getType()),
-                            (event.timestamp / 1000000),
+                    (event.timestamp / 1000000),
                     Float.toString(event.values[0]),
                     Float.toString(event.values[1]),
                     Float.toString(event.values[2]));
