@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -32,7 +33,8 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     Socket socket;
 
-    String ip = "143.248.197.106";
+    //String ip = "143.248.56.249";
+    String ip = "143.248.197.176";
     int port = 5000;
 
     @Override
@@ -40,13 +42,10 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setAmbientEnabled();
-
-        IO.Options opts = new IO.Options();
-        opts.reconnection = false;
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         try {
-            socket = IO.socket("http://" + ip + ":" + port + "/mynamespace");//, opts);
+            socket = IO.socket("http://" + ip + ":" + port + "/mynamespace");
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -62,8 +61,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         }).on("response", new Emitter.Listener() {
 
             @Override
-            public void call(Object... args) {
-            }
+            public void call(Object... args) {}
 
         }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
 
@@ -115,11 +113,17 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         if (modeFlag == 1) {
             socket.emit("request",
                     Integer.toString(event.sensor.getType()),
-                    (event.timestamp / 1000000),
+                    event.timestamp / 1000000.0,
                     Float.toString(event.values[0]),
                     Float.toString(event.values[1]),
                     Float.toString(event.values[2]));
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        socket.disconnect();
     }
 
     @Override
