@@ -25,6 +25,7 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
+import java.util.Collections;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,14 +38,14 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     private TextView mTargetView;
     private TextView mResultView;
-    private TextView mRecordFlagView;
     private Button mButton;
 
     private int modeFlag = 0;
 
     Socket socket;
 
-    String ip = "143.248.56.249";
+    //String ip = "143.248.56.249";
+    String ip = "143.248.197.15";
     int port = 5000;
 
     int targetIndex;
@@ -60,6 +61,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         targetIndex = 0;
+
         for (int j = 0; j < 2; j++)
         {
             String tempTarget = (j == 0) ? "Pinch" : "Wave";
@@ -68,6 +70,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 targetList.add(tempTarget);
             }
         }
+        Collections.shuffle(targetList);
 
         IO.Options opts = new IO.Options();
         opts.forceNew = true;
@@ -89,7 +92,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                     public void run() {
                         mHandler.obtainMessage(1).sendToTarget();
                     }
-                }, 0, 3000);
+                }, 1000, 4000);
             }
 
         }).on("response", new Emitter.Listener() {
@@ -133,16 +136,15 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         mTargetView = findViewById(R.id.targetView);
         mResultView = findViewById(R.id.resultView);
-        mRecordFlagView = findViewById(R.id.recordFlagView);
         mButton = findViewById(R.id.recordButton);
         mButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 if (modeFlag == 0) {
                     socket.connect();
-                    mRecordFlagView.setText("Recording");
+                    mButton.setText("Recording");
                 } else {
                     socket.emit("done");
-                    mRecordFlagView.setText("Ready");
+                    mButton.setText("Ready");
                     modeFlag = 0;
                     finish();
                     System.exit(0);
@@ -159,11 +161,13 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     public Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
             if (targetIndex < 20){
+                socket.emit("intask", targetIndex, targetList.get(targetIndex));
                 mTargetView.setText(Integer.toString(targetIndex + 1) + " " + targetList.get(targetIndex));
                 targetIndex += 1;
             }
             else
             {
+                socket.emit("done");
                 mTargetView.setText("Done");
             }
         }

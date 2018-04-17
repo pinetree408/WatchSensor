@@ -11,34 +11,26 @@
         android:layout_centerHorizontal="true"
         android:layout_weight="1"
         android:layout_marginBottom="15dp"
+        android:textSize="20dp"
         android:text="Target" />
 
     <TextView
         android:id="@+id/resultView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/recordFlagView"
-        android:layout_centerHorizontal="true"
-        android:layout_weight="1"
-        android:layout_marginBottom="15dp"
-        android:text="Result" />
-
-
-    <TextView
-        android:id="@+id/recordFlagView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_above="@+id/recordButton"
         android:layout_centerHorizontal="true"
         android:layout_weight="1"
-        android:text="Ready" />
+        android:layout_marginBottom="20dp"
+        android:textSize="15dp"
+        android:text="Result" />
 
     <Button
         android:id="@+id/recordButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Button"
+        android:text="Ready"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="30dp" />
